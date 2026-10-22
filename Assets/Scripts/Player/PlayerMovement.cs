@@ -24,7 +24,7 @@ namespace Player
         private void Update()
         {
             Vector2 moveInput = InputManager.Instance.Inputs.Player.Move.ReadValue<Vector2>();
-            Vector3 moveVector = (moveInput.y * transform.forward + moveInput.x * transform.right) * (Time.deltaTime * _speed);
+            Vector3 moveVector = new Vector3(moveInput.x, 0f, moveInput.y) * (Time.deltaTime * _speed);
             
             _characterController.Move(moveVector);
         }
