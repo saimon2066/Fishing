@@ -113,16 +113,6 @@ namespace Game.Input
                     ""interactions"": """",
                     ""initialStateCheck"": false,
                     ""priority"": 0
-                },
-                {
-                    ""name"": ""Reel"",
-                    ""type"": ""Button"",
-                    ""id"": ""05fed0fe-64cb-4d27-82e6-58a87d4171f3"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false,
-                    ""priority"": 0
                 }
             ],
             ""bindings"": [
@@ -268,10 +258,28 @@ namespace Game.Input
                     ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
+                }
+            ]
+        },
+        {
+            ""name"": ""Fishing"",
+            ""id"": ""eb684f93-172a-4acf-acb0-16d6a1722773"",
+            ""actions"": [
+                {
+                    ""name"": ""Reel"",
+                    ""type"": ""Button"",
+                    ""id"": ""f58db35a-6e5e-4d5c-994d-0008287e9de5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                }
+            ],
+            ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""d6722b37-0bc3-4c89-a22d-e0bc3fe0aba3"",
+                    ""id"": ""43c63b32-a2f5-48ff-a5ba-46dc6b439c89"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -876,7 +884,9 @@ namespace Game.Input
             m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
             m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
             m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
-            m_Player_Reel = m_Player.FindAction("Reel", throwIfNotFound: true);
+            // Fishing
+            m_Fishing = asset.FindActionMap("Fishing", throwIfNotFound: true);
+            m_Fishing_Reel = m_Fishing.FindAction("Reel", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -894,6 +904,7 @@ namespace Game.Input
         ~@IAAMain()
         {
             UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, IAAMain.Player.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Fishing.enabled, "This will cause a leak and performance issues, IAAMain.Fishing.Disable() has not been called.");
             UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, IAAMain.UI.Disable() has not been called.");
         }
 
@@ -972,7 +983,6 @@ namespace Game.Input
         private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
         private readonly InputAction m_Player_Move;
         private readonly InputAction m_Player_Interact;
-        private readonly InputAction m_Player_Reel;
         /// <summary>
         /// Provides access to input actions defined in input action map "Player".
         /// </summary>
@@ -992,10 +1002,6 @@ namespace Game.Input
             /// Provides access to the underlying input action "Player/Interact".
             /// </summary>
             public InputAction @Interact => m_Wrapper.m_Player_Interact;
-            /// <summary>
-            /// Provides access to the underlying input action "Player/Reel".
-            /// </summary>
-            public InputAction @Reel => m_Wrapper.m_Player_Reel;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1028,9 +1034,6 @@ namespace Game.Input
                 @Interact.started += instance.OnInteract;
                 @Interact.performed += instance.OnInteract;
                 @Interact.canceled += instance.OnInteract;
-                @Reel.started += instance.OnReel;
-                @Reel.performed += instance.OnReel;
-                @Reel.canceled += instance.OnReel;
             }
 
             /// <summary>
@@ -1048,9 +1051,6 @@ namespace Game.Input
                 @Interact.started -= instance.OnInteract;
                 @Interact.performed -= instance.OnInteract;
                 @Interact.canceled -= instance.OnInteract;
-                @Reel.started -= instance.OnReel;
-                @Reel.performed -= instance.OnReel;
-                @Reel.canceled -= instance.OnReel;
             }
 
             /// <summary>
@@ -1084,6 +1084,102 @@ namespace Game.Input
         /// Provides a new <see cref="PlayerActions" /> instance referencing this action map.
         /// </summary>
         public PlayerActions @Player => new PlayerActions(this);
+
+        // Fishing
+        private readonly InputActionMap m_Fishing;
+        private List<IFishingActions> m_FishingActionsCallbackInterfaces = new List<IFishingActions>();
+        private readonly InputAction m_Fishing_Reel;
+        /// <summary>
+        /// Provides access to input actions defined in input action map "Fishing".
+        /// </summary>
+        public struct FishingActions
+        {
+            private @IAAMain m_Wrapper;
+
+            /// <summary>
+            /// Construct a new instance of the input action map wrapper class.
+            /// </summary>
+            public FishingActions(@IAAMain wrapper) { m_Wrapper = wrapper; }
+            /// <summary>
+            /// Provides access to the underlying input action "Fishing/Reel".
+            /// </summary>
+            public InputAction @Reel => m_Wrapper.m_Fishing_Reel;
+            /// <summary>
+            /// Provides access to the underlying input action map instance.
+            /// </summary>
+            public InputActionMap Get() { return m_Wrapper.m_Fishing; }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+            public void Enable() { Get().Enable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+            public void Disable() { Get().Disable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+            public bool enabled => Get().enabled;
+            /// <summary>
+            /// Implicitly converts an <see ref="FishingActions" /> to an <see ref="InputActionMap" /> instance.
+            /// </summary>
+            public static implicit operator InputActionMap(FishingActions set) { return set.Get(); }
+            /// <summary>
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <param name="instance">Callback instance.</param>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+            /// </remarks>
+            /// <seealso cref="FishingActions" />
+            public void AddCallbacks(IFishingActions instance)
+            {
+                if (instance == null || m_Wrapper.m_FishingActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_FishingActionsCallbackInterfaces.Add(instance);
+                @Reel.started += instance.OnReel;
+                @Reel.performed += instance.OnReel;
+                @Reel.canceled += instance.OnReel;
+            }
+
+            /// <summary>
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <remarks>
+            /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+            /// </remarks>
+            /// <seealso cref="FishingActions" />
+            private void UnregisterCallbacks(IFishingActions instance)
+            {
+                @Reel.started -= instance.OnReel;
+                @Reel.performed -= instance.OnReel;
+                @Reel.canceled -= instance.OnReel;
+            }
+
+            /// <summary>
+            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="FishingActions.UnregisterCallbacks(IFishingActions)" />.
+            /// </summary>
+            /// <seealso cref="FishingActions.UnregisterCallbacks(IFishingActions)" />
+            public void RemoveCallbacks(IFishingActions instance)
+            {
+                if (m_Wrapper.m_FishingActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            /// <summary>
+            /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+            /// </remarks>
+            /// <seealso cref="FishingActions.AddCallbacks(IFishingActions)" />
+            /// <seealso cref="FishingActions.RemoveCallbacks(IFishingActions)" />
+            /// <seealso cref="FishingActions.UnregisterCallbacks(IFishingActions)" />
+            public void SetCallbacks(IFishingActions instance)
+            {
+                foreach (var item in m_Wrapper.m_FishingActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_FishingActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        /// <summary>
+        /// Provides a new <see cref="FishingActions" /> instance referencing this action map.
+        /// </summary>
+        public FishingActions @Fishing => new FishingActions(this);
 
         // UI
         private readonly InputActionMap m_UI;
@@ -1365,6 +1461,14 @@ namespace Game.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnInteract(InputAction.CallbackContext context);
+        }
+        /// <summary>
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Fishing" which allows adding and removing callbacks.
+        /// </summary>
+        /// <seealso cref="FishingActions.AddCallbacks(IFishingActions)" />
+        /// <seealso cref="FishingActions.RemoveCallbacks(IFishingActions)" />
+        public interface IFishingActions
+        {
             /// <summary>
             /// Method invoked when associated input action "Reel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

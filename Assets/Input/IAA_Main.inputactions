@@ -25,16 +25,6 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
-                },
-                {
-                    "name": "Reel",
-                    "type": "Button",
-                    "id": "05fed0fe-64cb-4d27-82e6-58a87d4171f3",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false,
-                    "priority": 0
                 }
             ],
             "bindings": [
@@ -180,10 +170,28 @@
                     "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
+                }
+            ]
+        },
+        {
+            "name": "Fishing",
+            "id": "eb684f93-172a-4acf-acb0-16d6a1722773",
+            "actions": [
+                {
+                    "name": "Reel",
+                    "type": "Button",
+                    "id": "f58db35a-6e5e-4d5c-994d-0008287e9de5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                }
+            ],
+            "bindings": [
                 {
                     "name": "",
-                    "id": "d6722b37-0bc3-4c89-a22d-e0bc3fe0aba3",
+                    "id": "43c63b32-a2f5-48ff-a5ba-46dc6b439c89",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",

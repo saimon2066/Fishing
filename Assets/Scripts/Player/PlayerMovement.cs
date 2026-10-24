@@ -3,16 +3,17 @@ using UnityEngine;
 
 namespace Player
 {
-    [RequireComponent(typeof(CharacterController))]
     public class PlayerMovement : MonoBehaviour
     {
-        [SerializeField] private float _speed;
+        [SerializeField] private float _acceleration = 25f;
+        [SerializeField] private float _maxSpeed = 7.5f;
+        [SerializeField] private float _brakeDamping = 8f;
         
-        private CharacterController _characterController;
+        private Rigidbody _rigidbody;
 
         private void Awake()
         {
-            _characterController = GetComponent<CharacterController>();
+            _rigidbody = GetComponent<Rigidbody>();
         }
 
         private void Start()
@@ -21,12 +22,22 @@ namespace Player
             Cursor.lockState = CursorLockMode.Locked;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             Vector2 moveInput = InputManager.Instance.Inputs.Player.Move.ReadValue<Vector2>();
-            Vector3 moveVector = new Vector3(moveInput.x, 0f, moveInput.y) * (Time.deltaTime * _speed);
             
-            _characterController.Move(moveVector);
+            if (moveInput.sqrMagnitude <= 0f)
+            {
+                _rigidbody.linearDamping = _brakeDamping;
+                return;
+            }
+            _rigidbody.linearDamping = 0f;
+            
+            Vector3 targetVector = new Vector3(moveInput.x, 0f, moveInput.y) * _maxSpeed;
+            Vector3 horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
+            
+            Vector3 accelerationForce = Vector3.ClampMagnitude((targetVector - horizontalVelocity) / Time.fixedDeltaTime, _acceleration);
+            _rigidbody.AddForce(accelerationForce, ForceMode.Acceleration);
         }
     }
 }
