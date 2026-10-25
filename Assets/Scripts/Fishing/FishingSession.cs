@@ -6,58 +6,32 @@ namespace Fishing
 {
     public class FishingSession
     {
-        [Serializable]
-        public struct Settings
-        {
-            public float ReelSpeed;
-            public float ReelSize;
-        
-            public float FishSpeed;
-            public float FishSize;
-            public float FishCooldownMin, FishCooldownMax;
-        
-            public float FillTime;
-            public float FillStart;
+        private readonly Settings _settings;
+        private float _fishTargetPos;
+        private float _fishTimer;
 
-            public Settings(float reelSpeed, float reelSize, float fishSpeed, float fishSize, float fishCooldownMin, float fishCooldownMax, float fillTime, float fillStart)
-            {
-                ReelSpeed = reelSpeed;
-                ReelSize = reelSize;
-                FishSpeed = fishSpeed;
-                FishSize = fishSize;
-                FishCooldownMin = fishCooldownMin;
-                FishCooldownMax = fishCooldownMax;
-                FillTime = fillTime;
-                FillStart = fillStart;
-            }
+        private float _reelVelocity;
+
+        public FishingSession(Settings settings)
+        {
+            _settings = settings;
+
+            Fill = _settings.FillStart;
         }
-        
+
         public float ReelPos { get; private set; }
         public float FishPos { get; private set; }
         public float Fill { get; private set; }
         public bool IsFinished { get; private set; }
-        
-        public event Action FishingSuccess; 
-        public event Action FishingFail; 
-        
-        private readonly Settings _settings; 
-        
-        private float _reelVelocity;
-        private float _fishTargetPos;
-        private float _fishTimer;
-        
-        public FishingSession(Settings settings)
-        {
-            _settings = settings;
-            
-            Fill = _settings.FillStart; 
-        }
+
+        public event Action FishingSuccess;
+        public event Action FishingFail;
 
         public void Update(float deltaTime, bool isReeling)
         {
             if (IsFinished)
                 return;
-            
+
             switch (Fill)
             {
                 case >= 1f:
@@ -74,20 +48,20 @@ namespace Fishing
             MoveFish(deltaTime);
 
             if (IsReelInsideFish())
-                Fill += deltaTime / _settings.FillTime;
+                Fill += deltaTime / _settings.FillUpTime;
             else
-                Fill -= deltaTime / _settings.FillTime;
-            
+                Fill -= deltaTime / _settings.FillDownTime;
+
             Fill = Mathf.Clamp(Fill, 0f, 1f);
         }
 
         private void MoveReel(float deltaTime, bool isReeling)
         {
             float reelAxis = isReeling ? 1f : -1f;
-            
+
             _reelVelocity += reelAxis * _settings.ReelSpeed * deltaTime;
             ReelPos += _reelVelocity * deltaTime;
-        
+
             float maxPosition = 1f - _settings.ReelSize;
             if (ReelPos <= 0f || ReelPos >= maxPosition)
                 _reelVelocity *= -0.35f;
@@ -114,6 +88,34 @@ namespace Fishing
         private bool IsReelInsideFish()
         {
             return ReelPos >= FishPos && ReelPos + _settings.ReelSize <= FishPos + _settings.FishSize;
+        }
+
+        [Serializable]
+        public struct Settings
+        {
+            public float ReelSpeed;
+            public float ReelSize;
+
+            public float FishSpeed;
+            public float FishSize;
+            public float FishCooldownMin, FishCooldownMax;
+
+            public float FillUpTime, FillDownTime;
+            public float FillStart;
+
+            public Settings(float reelSpeed, float reelSize, float fishSpeed, float fishSize, float fishCooldownMin,
+                float fishCooldownMax, float fillUpTime, float fillDownTime, float fillStart)
+            {
+                ReelSpeed = reelSpeed;
+                ReelSize = reelSize;
+                FishSpeed = fishSpeed;
+                FishSize = fishSize;
+                FishCooldownMin = fishCooldownMin;
+                FishCooldownMax = fishCooldownMax;
+                FillUpTime = fillUpTime;
+                FillDownTime = fillDownTime;
+                FillStart = fillStart;
+            }
         }
     }
 }

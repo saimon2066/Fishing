@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Camera
 {
-    [RequireComponent(typeof(Collider))]    
+    [RequireComponent(typeof(Collider))]
     public class CinemachinePrioritizeOnTrigger : MonoBehaviour
     {
         [SerializeField] private CinemachineCamera _camera;
