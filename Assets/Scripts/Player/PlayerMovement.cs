@@ -37,7 +37,7 @@ namespace Player
             _rigidbody.linearDamping = 0f;
 
             Vector3 targetVector = new Vector3(moveInput.x, 0f, moveInput.y) * _maxSpeed;
-            Vector3 horizontalVelocity = new(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
+            Vector3 horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
 
             Vector3 accelerationForce =
                 Vector3.ClampMagnitude((targetVector - horizontalVelocity) / Time.fixedDeltaTime, _speed);

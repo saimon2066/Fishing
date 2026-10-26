@@ -1,4 +1,5 @@
-﻿using Game;
+﻿using System;
+using Game;
 using UnityEngine;
 
 namespace Tower
@@ -7,43 +8,23 @@ namespace Tower
     {
         private static float _towerHungerTime => GameManager.Instance.GameStats.TowerHungerTime;
         private static float _towerHungerPerFish => GameManager.Instance.GameStats.TowerHungerPerFish;
-        
-        [SerializeField] private TowerUI _towerUI;
 
-        private bool _canInteract;
-        
-        private float _hunger = 1f;
+        public string Text => "Press E to feed the tower!";
+        public float Hunger { get; private set; } = 1f;
 
         private void Update()
         {
-            _hunger -= Time.deltaTime / _towerHungerTime;
-            _hunger = Mathf.Clamp(_hunger, 0f, 1f);
-            
-            _towerUI.UpdateHungerFill(_hunger);
+            Hunger -= Time.deltaTime / _towerHungerTime;
+            Hunger = Mathf.Clamp(Hunger, 0f, 1f);
         }
 
         public void Interact()
         {
-            if (!_canInteract)
-                return;
+            int fishNeeded = Mathf.CeilToInt((1f - Hunger) / _towerHungerPerFish);
+            int fish = Mathf.Min(GameManager.Instance.GameData.FishData.FishCount, fishNeeded);
             
-            int fishNeeded = Mathf.CeilToInt((1f - _hunger) / _towerHungerPerFish);
-            int fish = Mathf.Min(GameManager.Instance.FishCount, fishNeeded);
-            
-            _hunger += fish * _towerHungerPerFish;
-            GameManager.Instance.RemoveFish(fish);
-        }
-
-        public void Focus()
-        {
-            _canInteract = true;
-            _towerUI.ShowHint();
-        }
-
-        public void UnFocus()
-        {
-            _canInteract = false;
-            _towerUI.HideHint();
+            Hunger += fish * _towerHungerPerFish;
+            GameManager.Instance.GameData.FishData.Remove(fish);
         }
     }
 }

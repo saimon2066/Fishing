@@ -15,7 +15,7 @@ namespace Game.Input
             else
                 Destroy(gameObject);
 
-            Inputs = new();
+            Inputs = new IAAMain();
         }
 
         private void OnEnable()

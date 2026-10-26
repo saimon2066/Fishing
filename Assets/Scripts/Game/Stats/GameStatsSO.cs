@@ -8,10 +8,13 @@ namespace Game.Stats
     {
         [Header("Fishing")] 
         public FishingSession.Settings FishingSettings;
-        public int FishPerCatch;
+        public int FishPerCatchMin;
+        public int FishPerCatchMax;
         [Header("Tower")] 
         public float TowerHungerTime;
         public float TowerHungerPerFish;
+        [Header("Upgrades")] 
+        public int BaseXP;
         [Header("Movement")] 
         public float MovementSpeed = 25f;
         public float MovementMaxSpeed = 7.5f;

@@ -1,19 +1,25 @@
-﻿using Game;
+﻿using System;
+using Game;
 using Game.Input;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Fishing
 {
     public class FishingController : MonoBehaviour, IInteractable
     {
-        private static FishingSession.Settings _settings => GameManager.Instance.GameStats.FishingSettings;
+        public static event Action<FishingSession> SessionStarted;
+        public static event Action SessionEnded;
         
-        [SerializeField] private FishingUI _fishingUI;
+        private static FishingSession.Settings _settings => GameManager.Instance.GameStats.FishingSettings;
+        private static int _fishPerCatchMin => GameManager.Instance.GameStats.FishPerCatchMin;
+        private static int _fishPerCatchMax => GameManager.Instance.GameStats.FishPerCatchMax;
 
-        private bool _canInteract;
-        private FishingSession _fishingSession;
-
+        public string Text => "Press E to start fishing!";
+        
         private bool _isFishing => _fishingSession != null;
+        
+        private FishingSession _fishingSession;
 
         private void Update()
         {
@@ -23,58 +29,34 @@ namespace Fishing
             bool isReeling = InputManager.Instance.Inputs.Fishing.Reel.IsPressed();
             _fishingSession.Update(Time.deltaTime, isReeling);
 
-            if (_fishingSession.IsFinished)
-            {
-                EndSession();
+            if (!_fishingSession.IsFinished) 
                 return;
-            }
-
-            _fishingUI.UpdateReelPosition(_fishingSession.ReelPos);
-            _fishingUI.UpdateFishPosition(_fishingSession.FishPos);
-            _fishingUI.UpdateCatchFill(_fishingSession.Fill);
+            
+            EndSession();
         }
-
+        
         public void Interact()
         {
-            if (!_canInteract)
-                return;
-
-            _fishingUI.HideHint();
             StartSession();
         }
-
-        public void Focus()
-        {
-            _canInteract = true;
-            _fishingUI.ShowHint();
-        }
-
-        public void UnFocus()
-        {
-            _canInteract = false;
-            _fishingUI.HideHint();
-        }
-
+        
         private void StartSession()
         {
             InputManager.Instance.Inputs.Player.Disable();
             InputManager.Instance.Inputs.Fishing.Enable();
 
-            _fishingSession = new(_settings);
-
-            _fishingUI.ShowMinigame();
-            _fishingUI.SetReelSize(_settings.ReelSize);
-            _fishingUI.SetFishSize(_settings.FishSize);
+            _fishingSession = new FishingSession(_settings);
 
             _fishingSession.FishingSuccess += () =>
             {
-                GameManager.Instance.AddFish(1);
-                Debug.Log("success");
+                int fish = Random.Range(_fishPerCatchMin, _fishPerCatchMax + 1);
+                GameManager.Instance.GameData.FishData.Add(fish);
             };
             _fishingSession.FishingFail += () =>
             {
-                Debug.Log("fail");
             };
+            
+            SessionStarted?.Invoke(_fishingSession);
         }
 
         private void EndSession()
@@ -82,10 +64,9 @@ namespace Fishing
             InputManager.Instance.Inputs.Player.Enable();
             InputManager.Instance.Inputs.Fishing.Disable();
 
-            _fishingUI.ShowHint();
-            _fishingUI.HideMinigame();
-
             _fishingSession = null;
+            
+            SessionEnded?.Invoke();
         }
     }
 }

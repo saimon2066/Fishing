@@ -16,14 +16,16 @@ MonoBehaviour:
     ReelSpeed: 1
     ReelSize: 0.05
     FishSpeed: 2
-    FishSize: 0.34
+    FishSize: 0.35
     FishCooldownMin: 0.25
     FishCooldownMax: 0.75
     FillUpTime: 5
     FillDownTime: 2.5
     FillStart: 0.5
-  FishPerCatch: 3
+  FishPerCatchMin: 1
+  FishPerCatchMax: 3
   TowerHungerTime: 60
   TowerHungerPerFish: 0.2
+  BaseXP: 0
   MovementSpeed: 25
   MovementMaxSpeed: 7.5
