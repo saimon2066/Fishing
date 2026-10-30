@@ -1,3 +1,4 @@
+using System;
 using Player;
 using TMPro;
 using UnityEngine;
@@ -13,6 +14,11 @@ namespace UI
         private void OnEnable()
         {
             _playerInteract.FocusChanged += OnFocusChanged;
+        }
+
+        private void OnDisable()
+        {
+            _playerInteract.FocusChanged -= OnFocusChanged;
         }
 
         private void OnFocusChanged(IInteractable interactable)

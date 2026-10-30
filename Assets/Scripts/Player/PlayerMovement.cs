@@ -18,12 +18,6 @@ namespace Player
             _rigidbody = GetComponent<Rigidbody>();
         }
 
-        private void Start()
-        {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-
         private void FixedUpdate()
         {
             Vector2 moveInput = InputManager.Instance.Inputs.Player.Move.ReadValue<Vector2>();

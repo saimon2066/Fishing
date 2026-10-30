@@ -1,5 +1,6 @@
 ﻿using System;
 using Game;
+using Game.Stats;
 using UnityEngine;
 
 namespace Tower
@@ -25,6 +26,7 @@ namespace Tower
             
             Hunger += fish * _towerHungerPerFish;
             GameManager.Instance.GameData.FishData.Remove(fish);
+            GameManager.Instance.GameData.UpgradeData.AddXP(fish * GameManager.Instance.GameStats.XPPerFish);
         }
     }
 }

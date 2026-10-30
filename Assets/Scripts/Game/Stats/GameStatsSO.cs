@@ -14,7 +14,9 @@ namespace Game.Stats
         public float TowerHungerTime;
         public float TowerHungerPerFish;
         [Header("Upgrades")] 
-        public int BaseXP;
+        public int XPBase;
+        public float XPGrowth;
+        public int XPPerFish;
         [Header("Movement")] 
         public float MovementSpeed = 25f;
         public float MovementMaxSpeed = 7.5f;

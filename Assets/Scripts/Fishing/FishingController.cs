@@ -1,6 +1,7 @@
 ﻿using System;
 using Game;
 using Game.Input;
+using Game.Stats;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,7 +11,7 @@ namespace Fishing
     {
         public static event Action<FishingSession> SessionStarted;
         public static event Action SessionEnded;
-        
+
         private static FishingSession.Settings _settings => GameManager.Instance.GameStats.FishingSettings;
         private static int _fishPerCatchMin => GameManager.Instance.GameStats.FishPerCatchMin;
         private static int _fishPerCatchMax => GameManager.Instance.GameStats.FishPerCatchMax;
